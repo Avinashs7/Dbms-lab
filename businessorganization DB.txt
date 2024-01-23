@@ -102,7 +102,7 @@ insert into Employee values
 
 insert into Project values(7,"EV","RR nagar",11),
 (123,"Blind stick","Rnsit",5),
-(452,"Ticket booking","Banshankari",9),
+(452,"IOT","Banshankari",9),
 (124,"Email generator","Channasandra",9),
 (451,"Apartment ebay","Mantri alpyne",5),
 (75,"University management","Nagarbhavi",5);
@@ -110,7 +110,7 @@ insert into Project values(7,"EV","RR nagar",11),
 insert into Dlocation values(5,"Bengaluru South"),(9,"Bengaluru North"),(11,"Japan");
 
 insert into Works_on
-values(64,123,2),(64,451,3),(64,75,2),(12,123,2),(12,451,3),(12,75,2),(56,123,2),(43,451,3),(8,75,2),(8,123,2),(56,451,3),(35,75,2),(35,7,11),(101,7,11),(121,7,11),(1,7,11),(78,7,11);
+values(64,123,2),(64,451,3),(64,75,2),(12,123,2),(12,451,3),(12,75,2),(56,123,2),(43,451,3),(8,75,2),(8,123,2),(56,451,3),(35,75,2),(35,7,11),(101,7,11),(121,7,11),(1,7,11),(78,7,11),(64,452,3),(43,452,1);
 
 
 
@@ -120,10 +120,10 @@ select * from Dlocation;
 select * from Project;
 select * from Works_on;
 
-select fname,lname from Employee where NOT EXISTS(select pno from Project where dno=5 except select pno from Works_on w where w.ssn=ssn);
+select fname,lname from Employee where NOT EXISTS(select p.pno from Project p where p.dno=5 except select w.pno from Works_on w where w.ssn=ssn);
 
-select distinct (pno) from Project p,Department d,Employee e where p.dno=d.dno and d.mgr_ssn=e.ssn and e.lname="Scott" union select distinct (pno) from Project p,Works_on w,Employee e where p.pno=w.pno and w.ssn=e.ssn and lname="Scott";
+select distinct p.pno from Project p,Department d,Employee e where p.dno=d.dno and d.mgr_ssn=e.ssn and e.lname="Scott" union select distinct p.pno from Project p,Works_on w,Employee e where p.pno=w.pno and w.ssn=e.ssn and lname="Scott";
 
-select fname,lname,1.1*salary inc_sal from Project p,Works_on w,Employee e where p.pno=w.pno and w.ssn=e.ssn and p.pname="EV";
+select fname,lname,1.1*salary inc_sal from Project p,Works_on w,Employee e where p.pno=w.pno and w.ssn=e.ssn and p.pname="IOT";
 
-select dno,count(*) from Employee e,Department d where d.dno=e.dno and e.salary>60000 and d.dno in(select dno from Employee group by dno having count(*)>5 group by d.dno;
+select d.dno, count(*) from Employee e,Department d where d.dno=e.dno and e.salary>60000 and d.dno in (select dno from Employee group by dno having count(*)>5) group by d.dno;
