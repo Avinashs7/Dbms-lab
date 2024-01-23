@@ -1,0 +1,129 @@
+create database businessorganization;
+
+use businessorganization;
+
+create table Employee(
+ssn int primary key,
+fname varchar(20),
+lname varchar(15),
+address varchar(45),
+sex varchar(10),
+salary int,
+dno int,
+superssn int
+);
+
+create table Department(
+dno int primary key,
+dname varchar(20),
+mgr_ssn int,
+mgr_startdate date 
+);
+
+alter table Employee 
+add constraint fk1
+foreign key (superssn) references Employee (ssn);
+
+alter table Employee
+add constraint fk2
+foreign key (dno) references Department (dno);
+
+alter table Department
+add constraint fk3
+foreign key (mgr_ssn) references Employee (ssn);
+
+create table Dlocation(
+dno int,
+dloc varchar(20),
+constraint fk7 foreign key(dno) references Department (dno)
+);
+
+alter table Dlocation add constraint pk3 primary key (dno,dloc);
+
+create table Project(
+pno int primary key,
+pname varchar(25),
+ploc varchar(20),
+dno int
+);
+
+create table Works_on(
+ssn int,
+pno int,
+hours int,
+constraint pk5 primary key (ssn,pno)
+);
+
+alter table Project 
+add constraint fk4
+foreign key (dno) references Employee (dno);
+
+alter table Works_on
+add constraint fk5
+foreign key (ssn) references Employee (ssn);
+
+alter table Works_on
+add constraint fk6
+foreign key (pno) references Project (pno);
+
+insert into Employee values(12,"Dilip","M","Nagarabhavi","Male",6000000,null,null),
+(36,"Ayush","K","Chikkalsandra","Male",5900000,null,null),
+(78,"Pratheek","","Yeshwanthpur","Male",4000000,null,null);
+
+insert into Department values(5,"CSE",12,"2021-12-28"),
+(9,"ISE",36,"2021-12-31"),
+(11,"Accounts",78,"2020-10-16");
+
+update Employee
+set dno=5
+where ssn=12;
+
+update Employee
+set dno=9
+where ssn=36;
+
+update Employee
+set dno=11
+where ssn=78;
+
+insert into Employee values
+(64,"Dhanush","M","Kadhrenahalli cross","Male",5500000,5,12),
+(56,"Eshwar","K","Kalenaaghrahara","Male",5000000,5,12),
+(8,"Abhiram","H R","Shivamogga","Male",5400000,5,12),
+(43,"Charan","G S","KGF","Male",5400000,5,12),
+(35,"Avinash","S","BDVT","Male",1000,5,12),
+(15,"Aditya","Prakash","Bihar","Male",5700000,9,36),
+(30,"Aprameya","R","Padmanabha nagar","Male",5200000,9,36),
+(62,"Handral","Jadesh","Bellari","Male",5000000,9,36),
+(39,"Bharath","Sindhe","Nayandahalli","Male",5300000,9,36),
+(101,"Varun","Vijay","Yeshwantpur","Male",3500000,11,78),
+(121,"Shamanth","Scott","Yeshwantpur","Male",3100000,11,78),
+(1,"Prajwal","Sharma","Channasandra","Male",3500000,11,78);
+
+insert into Project values(7,"EV","RR nagar",11),
+(123,"Blind stick","Rnsit",5),
+(452,"Ticket booking","Banshankari",9),
+(124,"Email generator","Channasandra",9),
+(451,"Apartment ebay","Mantri alpyne",5),
+(75,"University management","Nagarbhavi",5);
+
+insert into Dlocation values(5,"Bengaluru South"),(9,"Bengaluru North"),(11,"Japan");
+
+insert into Works_on
+values(64,123,2),(64,451,3),(64,75,2),(12,123,2),(12,451,3),(12,75,2),(56,123,2),(43,451,3),(8,75,2),(8,123,2),(56,451,3),(35,75,2),(35,7,11),(101,7,11),(121,7,11),(1,7,11),(78,7,11);
+
+
+
+select * from Employee;
+select * from Department;
+select * from Dlocation;
+select * from Project;
+select * from Works_on;
+
+select fname,lname from Employee where NOT EXISTS(select pno from Project where dno=5 except select pno from Works_on w where w.ssn=ssn);
+
+select distinct (pno) from Project p,Department d,Employee e where p.dno=d.dno and d.mgr_ssn=e.ssn and e.lname="Scott" union select distinct (pno) from Project p,Works_on w,Employee e where p.pno=w.pno and w.ssn=e.ssn and lname="Scott";
+
+select fname,lname,1.1*salary inc_sal from Project p,Works_on w,Employee e where p.pno=w.pno and w.ssn=e.ssn and p.pname="EV";
+
+select dno,count(*) from Employee e,Department d where d.dno=e.dno and e.salary>60000 and d.dno in(select dno from Employee group by dno having count(*)>5 group by d.dno;
