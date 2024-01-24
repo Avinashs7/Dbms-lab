@@ -120,7 +120,7 @@ select * from Dlocation;
 select * from Project;
 select * from Works_on;
 
-select fname,lname from Employee where NOT EXISTS(select p.pno from Project p where p.dno=5 except select w.pno from Works_on w where w.ssn=ssn);
+select fname,lname from Employee e where NOT EXISTS(select p.pno from Project p where p.dno=5 except select w.pno from Works_on w where w.ssn=e.ssn);
 
 select distinct p.pno from Project p,Department d,Employee e where p.dno=d.dno and d.mgr_ssn=e.ssn and e.lname="Scott" union select distinct p.pno from Project p,Works_on w,Employee e where p.pno=w.pno and w.ssn=e.ssn and lname="Scott";
 
