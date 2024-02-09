@@ -1,0 +1,151 @@
+create table Book(
+book_id int,
+constraint pk1 primary key (book_id),
+title varchar(30),
+pub_year date,
+publisher_name varchar(20)
+);
+
+create table Book_authors(
+book_id int,
+constraint fk1 foreign key (book_id) references Book(book_id) on delete cascade,
+author_name varchar(20),
+constraint pk2 primary key(book_id,author_name)
+);
+
+create table Publisher(
+name varchar(20),
+constraint pk3 primary key (name),
+phn_no int,
+address varchar(45)
+);
+
+alter table Book
+add constraint fk2 foreign key (publisher_name) references Publisher(name) on delete cascade;
+
+create table Book_copies(
+book_id int,
+branch_id int,
+no_of_copies int,
+constraint fk3 foreign key (book_id) references Book(book_id) on delete cascade,
+constraint pk4 primary key (book_id,branch_id)
+);
+
+create table Book_lending(
+book_id int,
+branch_id int,
+card_no int,
+date_out date,
+due_date date,
+constraint pk5 primary key (book_id,branch_id,card_no)
+);
+
+create table Library_branch(
+branch_id int,
+address varchar(45),
+branch_name varchar(20),
+constraint pk6 primary key (branch_id)
+);
+
+create table Card(
+card_no int,
+constraint pk7 primary key (card_no)
+);
+
+
+alter table Book_copies
+add constraint fk4 foreign key (branch_id) references Library_branch (branch_id) on delete cascade;
+
+alter table Book_lending
+add constraint fk5 foreign key (branch_id) references Library_branch (branch_id) on delete cascade;
+
+desc Book;
+desc Book_authors;
+desc Publisher;
+desc Book_copies;
+desc Book_lending;
+desc Library_branch;
+
+insert into Publisher values
+("John",78945632,"New york"),
+("Harry",4587963,"Canada")
+;
+
+insert into Book values
+(7,"Alchemist","2007-01-15","John"),
+(3,"Macbeth","2004-11-27","Harry"),
+(2,"Harry potter","2008-06-04","John"),
+(1,"Kathasarithsagar","2010-12-12","Harry"),
+(45,"Da vinci code","2005-07-11","John"),
+(75,"Angels of demon","2009-05-21","Harry");
+
+insert into Book_authors values
+(7,"Paulo coelho"),
+(3,"William Shakespeare"),
+(2,"J K Rowling"),
+(1,"Somadeva"),
+(45,"Dan brown"),
+(75,"Dan brown");
+
+insert into Library_branch values
+(45,"Malleshwaram, Bengaluru","Banglore library"),
+(36,"Majestic, Banglore","Kempegowda library"),
+(24,"Yelahanka,Banglore","Kuvempu library"),
+(94,"KR puram,Banglore","central library");
+
+insert into Book_copies values
+(7,45,6510),
+(3,45,2000),
+(2,45,8502),
+(45,45,1250),
+(75,45,4130),
+(1,36,1245),
+(45,36,1563),
+(3,36,4587),
+(7,36,4521),
+(7,24,1563),
+(2,24,321),
+(45,24,1452),
+(75,24,235),
+(1,94,3564),
+(45,94,1452),
+(3,94,7125)
+;
+
+insert into Card values
+(4512367),(45781236),(5478961),(9645234),(75469824);
+
+insert into Book_lending values
+(7,45,4512367,"2019-02-27","2020-01-20"),
+(3,94,45781236,"2021-07-14","2021-11-10"),
+(2,24,5478961,"2022-01-30","2022-03-12"),
+(1,36,9645234,"2022-09-24","2023-01-20"),
+(45,45,75469824,"2022-07-12","2023-02-24"),
+(75,94,45781236,"2021-05-03","2021-12-27");
+
+select * from Book;
+select * from Book_authors;
+select * from Publisher;
+select * from Book_copies;
+select * from Book_lending;
+select * from Library_branch;
+
+select b.title,b.book_id,b.publisher_name,a.author_name,c.no_of_copies,l.branch_id
+from Book b,Book_authors a,Book_copies c,Library_branch l
+where b.book_id=a.book_id and b.book_id=c.book_id and l.branch_id=c.branch_id;
+
+select card_no
+from Book_lending b
+where date_out between "2017-01-01" and "2017-07-31";
+
+delete from Book
+where book_id=6;
+
+create view v_publication as 
+select pub_year
+from Book;
+
+create view available_books as
+select b.book_id,b.title,c.no_of_copies
+from Book b,Book_copies c,Library_branch l
+where b.book_id=c.book_id and l.branch_id=c.branch_id;
