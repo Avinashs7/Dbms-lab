@@ -126,4 +126,6 @@ select distinct p.pno from Project p,Department d,Employee e where p.dno=d.dno a
 
 select fname,lname,1.1*salary inc_sal from Project p,Works_on w,Employee e where p.pno=w.pno and w.ssn=e.ssn and p.pname="IOT";
 
+select sum(salary) Total_salary, min(salary) Minimum_salary, max(salary) Maximum_salary, avg(salary) Average_salary from Employee e,Department d where e.dno=d.dno and dname="Accounts";
+
 select d.dno, count(*) from Employee e,Department d where d.dno=e.dno and e.salary>60000 and d.dno in (select dno from Employee group by dno having count(*)>5) group by d.dno;

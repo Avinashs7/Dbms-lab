@@ -89,3 +89,18 @@ create view maximum_order as(
 
 delete from salesman where salesman_id=61;
 select * from salesman;
+
+
+
+(select s.name,c.customer_name
+from salesman s,customer c
+where s.salesman_id=c.salesman_id and s.city=c.city
+)
+Union
+(select s.name,"no match"
+from salesman s
+where Not exists(
+    select *
+    from customer c
+    where s.salesman_id=c.salesman_id and s.city=c.city
+));
