@@ -1,0 +1,91 @@
+create table salesman(
+salesman_id int primary key,
+name varchar(20),
+city varchar(20),
+commission int
+);
+create table customer(
+customer_id int primary key,
+customer_name varchar(20),
+city varchar(20),
+grade int,
+salesman_id int,
+constraint fk1 foreign key (salesman_id) references salesman(salesman_id) on delete set null
+);
+create table orders(
+ord_no int primary key,
+purchase_amt int,
+ord_date date,
+customer_id int,
+salesman_id int,
+constraint fk2 foreign key (customer_id) references customer(customer_id) on delete cascade,
+constraint fk3 foreign key (salesman_id) references salesman(salesman_id) on delete cascade
+);
+
+insert into salesman values
+(7,"ronaldo","bengaluru",45),
+(45,"messi","chennai",52),
+(15,"mbappe","bengaluru",78),
+(16,"kohli","bengaluru",46),
+(33,"jadeja","chennai",16),
+(61,"ashwin","chennai",55),
+(26,"nehra","bengaluru",78);
+
+insert into customer values
+(123,"amith","goa",120,16),
+(145,"aravind","nz",150,7),
+(452,"abhiram","bengaluru",75,33),
+(652,"avinash","bengaluru",40,15),
+(321,"bharath","maharastra",82,26),
+(150,"dilip","chennai",82,15),
+(167,"dhanush","bengaluru",120,26);
+
+insert into orders values
+(7854,1000,"2023-11-01",123,16),
+(4512,750,"2022-12-04",452,33),
+(6984,2050,"2024-01-15",321,26),
+(4513,4510,"2023-09-27",167,26);
+
+select * from salesman;
+select * from customer;
+select * from orders;
+
+select count(*)
+from customer
+where grade >(
+select avg(grade) from customer where city="bengaluru");
+
+select grade,count(*)
+from customer
+where grade >(
+select avg(grade) from customer where city="bengaluru")
+group by grade;
+
+select s.name,s.salesman_id
+from salesman s,customer c
+where s.salesman_id=c.salesman_id
+group by c.salesman_id
+having count(*)>1;
+
+(select s.name
+from salesman s,customer c
+where s.salesman_id=c.salesman_id and s.city=c.city
+group by c.salesman_id)
+Union
+(select s.name
+from salesman s
+where Not exists(
+    select *
+    from customer c
+    where s.salesman_id=c.salesman_id and s.city=c.city
+    group by c.salesman_id
+));
+
+create view maximum_order as(
+	select o.ord_date,s.salesman_id,s.name
+	from salesman s,orders o
+	where s.salesman_id=o.salesman_id and o.purchase_amt=(select max(purchase_amt) from orders ord where o.ord_date=ord.ord_date)
+);
+
+delete from salesman where salesman_id=61;
+select * from salesman;
