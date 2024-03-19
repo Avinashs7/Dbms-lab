@@ -1,0 +1,115 @@
+create table Student(
+    usn varchar(10) primary key,
+    name varchar(25),
+    address varchar(45),
+    phone long, 
+    gender varchar(10)
+);
+
+create table Semsec(
+    ssid varchar(10) primary key,
+    sem int,
+    sec char(1)
+);
+
+create table Class(
+    usn varchar(10),
+    ssid varchar(10),
+    constraint primary key(usn,ssid),
+    constraint fk1 foreign key (usn) references Student(usn),
+    constraint fk2 foreign key (ssid) references Semsec(ssid)
+);
+
+create table Subject(
+    subcode varchar(10) primary key,
+    title varchar(10),
+    sem int,
+    credits int
+);
+
+create table Iamarks(
+    usn varchar(10),
+    subcode varchar(10),
+    ssid varchar(10),
+    test1 int,
+    test2 int,
+    test3 int,
+    finalia int,
+    constraint primary key(usn,subcode,ssid),
+    constraint fk3 foreign key (usn) references Student(usn),
+    constraint fk4 foreign key (subcode) references Subject(subcode),
+    constraint fk5 foreign key (ssid) references Semsec(ssid)
+);
+
+insert into Student values
+    ('1BI17CS053','Dilip','Nagarbhavi',784521369,'male'),
+    ('1BI17CS033','Arjun','banshankari',784521369,'male'),
+    ('1BI17CS062','Harsh','Chikalsandra',784521369,'male'),
+    ('1BI17CS043','Charan','Channasandra',784521369,'male'),
+    ('1BI17CS073','Kavitha','Jp nagar',784521369,'female'),
+    ('1BI17CS103','Sonam','Nagarbhavi',784521369,'female'),
+    ('1BI19CS023','Savitha','Hebbal',784521369,'female'),
+    ('1BI19CS043','Suresh','Jayanagar',784521369,'male');
+
+insert into Semsec values
+    ('CSE8A',8,'A'),
+    ('CSE4C',4,'C'),
+    ('CSE8B',8,'B');
+
+insert into Class values
+    ('1BI17CS053','CSE8A'),
+    ('1BI17CS033','CSE8B'),
+    ('1BI17CS062','CSE8A'),
+    ('1BI17CS043','CSE8B'),
+    ('1BI17CS073','CSE8A'),
+    ('1BI17CS103','CSE8B'),
+    ('1BI19CS023','CSE4C'),
+    ('1BI19CS043','CSE4C');
+
+insert into Subject values
+    ('17CS81','CGI',8,4),
+    ('17CS82','DSA',8,3),
+    ('17CS83','OOPS',8,2),
+    ('19CS41','ADE',4,4),
+    ('19CS43','C++',4,2);
+
+insert into Iamarks (usn,subcode,ssid,test1,test2,test3) values
+    ('1BI17CS053','17CS81','CSE8A',20,18,20),
+    ('1BI17CS053','17CS82','CSE8A',20,20,20),
+    ('1BI17CS053','17CS83','CSE8A',20,19,18),
+    ('1BI17CS033','17CS83','CSE8B',16,19,17),
+    ('1BI17CS033','17CS82','CSE8B',14,18,13),
+    ('1BI17CS033','17CS81','CSE8B',16,19,20),
+    ('1BI19CS023','19CS41','CSE4C',14,15,16),
+    ('1BI19CS023','19CS43','CSE4C',12,19,11),
+    ('1BI19CS043','19CS43','CSE4C',18,19,16),
+    ('1BI19CS043','19CS41','CSE4C',17,19,20);
+
+select s.*,ss.sem,ss.sec
+from Student s, Semsec ss, Class C
+where c.usn=s.usn and c.ssid=ss.ssid and ss.sem=4 and ss.sec='C';
+
+select ss.sem,ss.sec,s.gender,count(*)
+from Semsec ss,Student s,Class c
+where ss.ssid=c.ssid and s.usn=c.usn 
+group by s.gender,ss.sem,ss.sec
+order by ss.sem;
+
+create view test_marks as(
+    select i.test1
+    from Iamarks i,Student s
+    where s.usn=i.usn
+);
+
+update Iamarks
+set finalia=((test1+test2+test3)-least(test1,test2,test3))/2
+where usn is not null;
+
+select m.usn,m.subcode,m.finalia,
+    case
+        when (m.finalia<=20 and m.finalia>=17) then 'Outstanding'
+        when (m.finalia<17 and m.finalia>=12) then 'Average'
+        when (m.finalia<12) then 'weak'
+    end as Remark 
+from Iamarks m,Class c,Semsec ss
+where m.usn=c.usn and c.ssid=ss.ssid and ss.sem=8;

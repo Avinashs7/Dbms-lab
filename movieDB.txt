@@ -1,0 +1,118 @@
+create table Actor(
+    actid int primary key,
+    actname varchar(20),
+    gender varchar(10)
+);
+
+create table Director(
+    dirid int primary key,
+    dirname varchar(45),
+    phone long
+);
+
+create table Movies(
+    movieid int primary key,
+    title varchar(20),
+    year int,
+    lang varchar(20),
+    dirid int,
+    constraint fk1 foreign key (dirid) references Director(dirid) 
+);
+
+create table Moviecast(
+    actid int,
+    movieid int,
+    role varchar(20),
+    constraint primary key(actid,movieid),
+    constraint fk2 foreign key (actid) references Actor(actid),
+    constraint fk3 foreign key (movieid) references Movies(movieid)
+);
+
+create table Rating(
+    movieid int,
+    revstar int,
+    constraint primary key (movieid,revstar),
+    constraint fk4 foreign key (movieid) references Movies(movieid)
+);
+
+
+insert into Actor values
+    (1,"Dhanush","male"),
+    (6,"Dilip","male"),
+    (48,"Ayush","male"),
+    (54,"Eshwar","male"),
+    (75,"Charan","male");
+
+insert into Director values 
+    (365,"upendra",4785693210),
+    (4785,"nolan",9874563210),
+    (5471,"Karthik",4589637120),
+    (7436,"Rama",6578412900);
+
+insert into Movies values  
+    (6741,"KGF",2019,"kannada",5471),
+    (5748,"Banaras",2022,"Hindi",7436),
+    (7841,"Inception",2015,"English",4785),
+    (999,"Om",2000,"kannada",365);
+
+insert into Moviecast values    
+    (1,999,"poojari"),
+    (6,999,"kaage kumara"),
+    (75,6741,"hero"),
+    (6,7841,"lead"),
+    (48,5748,"hero"),
+    (48,6741,"brother"),
+    (54,999,"rowdy"),
+    (6,5748,"brother");
+
+insert into Rating values
+    (6741,9),(6741,8),(5748,6),(5748,7.2),(7841,10),(7841,9),(999,9.5);
+
+select * from Actor;
+select * from Director;
+select * from Movies;
+select * from Moviecast;
+select * from Rating;
+
+
+select m.title
+from Movies m,Director d
+where d.dirname="upendra" and d.dirid=m.dirid;
+
+select m.title
+from Movies m,Actor a,Moviecast mc 
+where m.movieid=mc.movieid and mc.actid in(
+    select a.actid
+    from Actor a,Moviecast m
+    where a.actid=m.actid
+    group by a.actid
+    having count(*)>1
+)
+group by m.movieid
+having count(*)>1;
+
+select distinct(a.actname)
+from Actor a
+Join Moviecast mc on mc.actid=a.actid
+Join Movies m on m.movieid=mc.movieid
+where m.year<=2003 
+union 
+select distinct(a.actname)
+from Actor a
+Join Moviecast mc on mc.actid=a.actid
+Join Movies m on m.movieid=mc.movieid
+where m.year>2003;
+
+select m.title,max(r.revstar)
+from Movies m
+inner join Rating r using(movieid)
+group by title
+order by title;
+
+update Rating
+set revstar=7
+where movieid in (
+    select m.movieid
+    from Movies m,Director d 
+    where m.dirid=d.dirid and d.dirname="upendra"
+)
